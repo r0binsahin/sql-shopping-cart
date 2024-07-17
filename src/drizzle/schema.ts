@@ -1,11 +1,4 @@
-import {
-  pgTable,
-  real,
-  uuid,
-  varchar,
-  integer,
-  primaryKey,
-} from 'drizzle-orm/pg-core';
+import { pgTable, real, uuid, varchar, integer } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm/relations';
 
 export const saltCart = pgTable('salt_cart', {
@@ -45,3 +38,6 @@ export const cartProduct = pgTable(
     primaryKey: [table.cartId, table.productId], //composite primary key
   })
 );
+
+export type SelectCart = typeof saltCart.$inferSelect;
+export type InsertCart = typeof saltCart.$inferInsert;
