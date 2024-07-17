@@ -11,10 +11,12 @@ const port = 3000;
 
 app.use(express.json());
 
-app.post('/api/carts', async (req, res) => {
-  const { title, description, authorId } = req.body;
 
-  if (!title || !description || !authorId) {
+app.post('/api/carts', async (req, res) => {
+  const { id } = req.body;
+
+
+  if () {
     return res.status(400).send('Missing some fields');
   }
 

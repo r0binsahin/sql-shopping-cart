@@ -3,8 +3,6 @@ import * as schema from './schema';
 import postgres from 'postgres';
 import 'dotenv/config';
 
-// TODO: move to the top when everything is wrapped in factories.
-
 const dbUrl = process.env.DB_URL;
 
 if (!dbUrl) {
