@@ -5,6 +5,7 @@ import {
   createCart,
   createProduct,
   deleteCartById,
+  getProductById,
 } from './drizzle/queries';
 import { InsertCart, InsertProduct } from './drizzle/schema';
 
@@ -48,7 +49,7 @@ app.post('/api/carts', async (req: Request, res: Response) => {
   }
 });
 
-//get caet by id
+//get cart by id
 
 app.get('/api/carts/:cartId', async (req: Request, res: Response) => {
   const { cartId } = req.params;
@@ -58,6 +59,20 @@ app.get('/api/carts/:cartId', async (req: Request, res: Response) => {
     if (!cart) return res.status(404).json({ message: 'Cart not found' });
 
     res.json(cart);
+  } catch (error) {
+    console.error('Error fetching cart:', error);
+    res.status(500).json({ message: 'Error fetching cart' });
+  }
+});
+
+app.get('/api/products/:id', async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    const product = await getProductById(id);
+
+    if (!product) return res.status(404).json({ message: 'Cart not found' });
+
+    res.json(product);
   } catch (error) {
     console.error('Error fetching cart:', error);
     res.status(500).json({ message: 'Error fetching cart' });

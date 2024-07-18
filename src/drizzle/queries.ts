@@ -27,3 +27,12 @@ export const deleteCartById = async () => {
 export const createProduct = async (product: InsertProduct) => {
   return await db.insert(productTable).values(product);
 };
+
+export const getProductById = async (productId: string) => {
+  return await db
+    .select()
+    .from(productTable)
+    .where(eq(productTable.id, productId));
+};
+
+export const insertProductIntoCart = () => {};
