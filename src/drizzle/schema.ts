@@ -13,8 +13,8 @@ export const saltCartRelations = relations(saltCart, ({ many }) => ({
 export const productTable = pgTable('product_table', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 255 }).notNull(),
-  price: varchar('price').notNull(),
-  quantity: varchar('quantity').notNull().default('0'),
+  price: real('price').notNull(),
+  quantity: integer('quantity').notNull().default(0),
 });
 
 //relation
@@ -40,10 +40,17 @@ export const cartProduct = pgTable(
 );
 
 export type SelectCart = typeof saltCart.$inferSelect;
+export type CartProduct = {
+  cartId: string;
+  productId: string;
+  quantity: number;
+  primaryKey: string[];
+};
+
 export type InsertProduct = {
   name: string;
-  price: string;
-  quantity: string;
+  price: number;
+  quantity: number;
   id?: string;
 };
 export type InsertCart = {

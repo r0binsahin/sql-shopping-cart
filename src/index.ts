@@ -19,8 +19,8 @@ app.use(express.json());
 function createRandomProduct(): InsertProduct {
   return {
     name: faker.commerce.product(),
-    price: faker.commerce.price({ min: 10, max: 250 }),
-    quantity: faker.finance.amount({ min: 0, max: 15, dec: 0 }),
+    price: Number(faker.commerce.price({ min: 10, max: 250 })),
+    quantity: Number(faker.finance.amount({ min: 0, max: 15, dec: 0 })),
   };
 }
 
@@ -64,6 +64,8 @@ app.get('/api/carts/:cartId', async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error fetching cart' });
   }
 });
+
+//get product by Id
 
 app.get('/api/products/:id', async (req: Request, res: Response) => {
   const { id } = req.params;
