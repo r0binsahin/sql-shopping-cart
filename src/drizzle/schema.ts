@@ -50,11 +50,16 @@ export type CartProduct = {
 };
 
 export type InsertProduct = {
-  name: string;
-  price: number;
   quantity: number;
-  id?: string;
+  productId: string;
 };
 export type InsertCart = {
   id?: string;
+};
+
+export type ProductInCart = {
+  productId: string;
+  name: string;
+  price: number;
+  quantity: number;
 };

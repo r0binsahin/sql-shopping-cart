@@ -5,9 +5,25 @@ import {
   InsertProduct,
   cartProduct,
   InsertCart,
+  CartProduct,
+  ProductInCart,
 } from './schema';
 import { db } from './index';
 import { eq } from 'drizzle-orm';
+
+type Product = {
+  name: string;
+  price: number;
+  quantity: number;
+  id?: string;
+};
+
+type CartWithProducts = {
+  cartid: string;
+  cartItems: ProductInCart[];
+  totalNumberOfItems: number;
+  totalPrice: number;
+};
 
 export const createCart = async (): Promise<InsertCart> => {
   const result = await db.insert(saltCart).values({});
@@ -23,7 +39,7 @@ export const getCartById = async (id: string) => {
 
   if (!cartResult) return null;
 
-  const cart: SelectCart = cartResult[0];
+  const cart = cartResult[0];
 
   const cartItems = await db
     .select()
@@ -42,20 +58,28 @@ export const getCartById = async (id: string) => {
     0
   );
 
+  const mappedCartItems = cartItems.map((item) => ({
+    productId: item.cart_product.productId,
+    name: item.product_table?.name || '', // Provide a default value if product_table is null
+    price: item.product_table?.price || 0, // Provide a default value if product_table is null
+    quantity: item.cart_product.quantity,
+  }));
+
   const cartId = cart.id;
-  return {
+  const cartWithProducts: CartWithProducts = {
     cartid: cartId,
-    cartItems: cartItems,
+    cartItems: mappedCartItems,
     totalNumberOfItems: totalNumberOfItems,
     totalPrice: totalPrice,
   };
+  return cartWithProducts;
 };
 
 export const deleteCartById = async () => {
   return null;
 };
 
-export const createProduct = async (product: InsertProduct) => {
+export const createProduct = async (product: Product) => {
   return await db.insert(productTable).values(product);
 };
 
@@ -74,18 +98,15 @@ export const addProductToCart = async (
   const cart = await getCartById(cartId);
   const product = await getProductById(productId);
 
-  await db
-    .insert(cartProduct)
-    .values({
-      cartId,
-      productId,
-      quantity,
-    })
-    .onConflictDoUpdate({
-      //if product already exists in cart it increments the quantity
-      target: [cartProduct.cartId, cartProduct.productId],
-      set: { quantity: quantity },
-    });
+  if (!cart || !product) {
+    throw new Error('Cart or product not found');
+  }
+
+  await db.insert(cartProduct).values({
+    cartId,
+    productId,
+    quantity,
+  });
 
   const updatedCart = await getCartById(cartId);
   return updatedCart;

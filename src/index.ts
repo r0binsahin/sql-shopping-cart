@@ -6,6 +6,7 @@ import {
   createProduct,
   deleteCartById,
   getProductById,
+  addProductToCart,
 } from './drizzle/queries';
 import { InsertCart, InsertProduct } from './drizzle/schema';
 
@@ -16,7 +17,7 @@ const port = 3000;
 
 app.use(express.json());
 
-function createRandomProduct(): InsertProduct {
+function createRandomProduct() {
   return {
     name: faker.commerce.product(),
     price: Number(faker.commerce.price({ min: 10, max: 250 })),
@@ -80,6 +81,25 @@ app.get('/api/products/:id', async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error fetching cart' });
   }
 });
+app.post(
+  '/api/carts/:cartId/products/',
+  async (req: Request, res: Response) => {
+    const { cartId } = req.params;
+    const { productId, quantity } = req.body;
+
+    try {
+      const updatedCart = await addProductToCart(productId, cartId, quantity);
+      if (!updatedCart) {
+        return res.status(404).json({ message: 'Cart or product not found' });
+      }
+
+      res.status(200).json(updatedCart);
+    } catch (error) {
+      console.error('Error fetching cart:', error);
+      res.status(500).json({ message: 'Error adding product to cart' });
+    }
+  }
+);
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
