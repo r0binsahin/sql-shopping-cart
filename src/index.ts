@@ -23,6 +23,8 @@ function createRandomProduct(): InsertProduct {
   };
 }
 
+//create product
+
 app.post('/api/products', async (req: Request, res: Response) => {
   const fakerProduct = createRandomProduct();
 
@@ -35,6 +37,7 @@ app.post('/api/products', async (req: Request, res: Response) => {
   }
 });
 
+//create cart
 app.post('/api/carts', async (req: Request, res: Response) => {
   try {
     const newCart: InsertCart = await createCart();
@@ -42,6 +45,22 @@ app.post('/api/carts', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error creating cart:', error);
     res.status(500).json({ message: 'Error creating cart' });
+  }
+});
+
+//get caet by id
+
+app.get('/api/carts/:cartId', async (req: Request, res: Response) => {
+  const { cartId } = req.params;
+  try {
+    const cart = await getCartById(cartId);
+
+    if (!cart) return res.status(404).json({ message: 'Cart not found' });
+
+    res.json(cart);
+  } catch (error) {
+    console.error('Error fetching cart:', error);
+    res.status(500).json({ message: 'Error fetching cart' });
   }
 });
 
