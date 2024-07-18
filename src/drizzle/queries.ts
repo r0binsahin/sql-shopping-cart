@@ -9,7 +9,7 @@ import {
   ProductInCart,
 } from './schema';
 import { db } from './index';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 
 type Product = {
   name: string;
@@ -102,11 +102,33 @@ export const addProductToCart = async (
     throw new Error('Cart or product not found');
   }
 
-  await db.insert(cartProduct).values({
-    cartId,
-    productId,
-    quantity,
-  });
+  const existingCartProduct = await db
+    .select()
+    .from(cartProduct)
+    .where(
+      and(eq(cartProduct.cartId, cartId), eq(cartProduct.productId, productId))
+    );
+
+  if (existingCartProduct.length > 0) {
+    // If the product is already in the cart, increment the quantity
+    const newQuantity = existingCartProduct[0].quantity + quantity;
+    await db
+      .update(cartProduct)
+      .set({ quantity: newQuantity })
+      .where(
+        and(
+          eq(cartProduct.cartId, cartId),
+          eq(cartProduct.productId, productId)
+        )
+      );
+  } else {
+    // If the product is not in the cart, insert it
+    await db.insert(cartProduct).values({
+      cartId,
+      productId,
+      quantity,
+    });
+  }
 
   const updatedCart = await getCartById(cartId);
   return updatedCart;
