@@ -46,4 +46,6 @@ export type InsertProduct = {
   quantity: string;
   id?: string;
 };
-export type InsertCart = typeof saltCart.$inferInsert;
+export type InsertCart = {
+  id?: string;
+};

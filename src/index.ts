@@ -1,4 +1,5 @@
 import express from 'express';
+import { Request, Response } from 'express';
 import {
   getCartById,
   createCart,
@@ -12,7 +13,7 @@ const port = 3000;
 app.use(express.json());
 
 import { faker } from '@faker-js/faker';
-import { InsertProduct } from './drizzle/schema';
+import { InsertCart, InsertProduct } from './drizzle/schema';
 
 interface Cart {
   id: string;
@@ -40,7 +41,7 @@ function createRandomproduct(): Product {
 }
 const fakeProduct = createRandomproduct();
 
-app.post('/api/products', async (req, res) => {
+app.post('/api/products', async (req: Request, res: Response) => {
   const product: InsertProduct = {
     name: fakeProduct.name,
     price: fakeProduct.price,
@@ -56,16 +57,15 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
-/* app.delete('/delete-recipe/:id', async (req, res) => {
-  const { id } = req.params;
-
+app.post('/api/carts', async (req: Request, res: Response) => {
   try {
-    res.status(201).send('Deleted recipe');
+    const newCart: InsertCart = await createCart();
+    res.status(201).location(`/api/carts/${newCart.id}`).json(newCart);
   } catch (error) {
-    console.error('Error deleting recipe', error);
-    res.status(500).send('Some delete error :(');
+    console.error('Error creating cart:', error);
+    res.status(500).json({ message: 'Error creating cart' });
   }
-}); */
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);

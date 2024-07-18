@@ -7,9 +7,10 @@ import {
 } from './schema';
 import { db } from './index';
 import { eq } from 'drizzle-orm';
+import { da } from '@faker-js/faker';
 
-export const createCart = async (data: InsertCart) => {
-  const newCart = await db.insert(saltCart).values({}).returning();
+export const createCart = async (): Promise<SelectCart> => {
+  const newCart = await db.insert(saltCart).values({});
   return newCart[0];
 };
 
