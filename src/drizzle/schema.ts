@@ -39,7 +39,9 @@ export const cartProduct = pgTable(
   })
 );
 
-export type SelectCart = typeof saltCart.$inferSelect;
+export type SelectCart = {
+  id: string;
+};
 export type CartProduct = {
   cartId: string;
   productId: string;

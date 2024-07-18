@@ -4,19 +4,26 @@ import {
   SelectCart,
   InsertProduct,
   cartProduct,
+  InsertCart,
 } from './schema';
 import { db } from './index';
 import { eq } from 'drizzle-orm';
 
-export const createCart = async (): Promise<SelectCart> => {
-  const newCart = await db.insert(saltCart).values({});
-  return newCart[0];
+export const createCart = async (): Promise<InsertCart> => {
+  const result = await db.insert(saltCart).values({});
+  const newCart: InsertCart = result[0];
+  return { id: newCart.id };
 };
 
 export const getCartById = async (id: string) => {
-  const cart = await db.select().from(saltCart).where(eq(saltCart.id, id));
+  const cartResult = await db
+    .select()
+    .from(saltCart)
+    .where(eq(saltCart.id, id));
 
-  if (!cart) return null;
+  if (!cartResult) return null;
+
+  const cart: SelectCart = cartResult[0];
 
   const cartItems = await db
     .select()
@@ -35,11 +42,12 @@ export const getCartById = async (id: string) => {
     0
   );
 
+  const cartId = cart.id;
   return {
-    cart,
-    items: cartItems,
-    totalNumberOfItems,
-    totalPrice,
+    cartid: cartId,
+    cartItems: cartItems,
+    totalNumberOfItems: totalNumberOfItems,
+    totalPrice: totalPrice,
   };
 };
 
