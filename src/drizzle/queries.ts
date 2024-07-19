@@ -7,9 +7,9 @@ import {
   InsertCart,
   CartProduct,
   ProductInCart,
-} from './schema';
-import { db } from './index';
-import { eq, and } from 'drizzle-orm';
+} from "./schema";
+import { db } from "./index";
+import { eq, and } from "drizzle-orm";
 
 type Product = {
   name: string;
@@ -25,9 +25,16 @@ type CartWithProducts = {
   totalPrice: number;
 };
 
-export const createCart = async (): Promise<InsertCart> => {
-  const result = await db.insert(saltCart).values({});
-  const newCart: InsertCart = result[0];
+type AddCart = {
+  id: string;
+};
+
+export const createCart = async () => {
+  const result = await db
+    .insert(saltCart)
+    .values({})
+    .returning({ id: saltCart.id });
+  const newCart: AddCart = result[0];
   return { id: newCart.id };
 };
 
@@ -60,7 +67,7 @@ export const getCartById = async (id: string) => {
 
   const mappedCartItems = cartItems.map((item) => ({
     productId: item.cart_product.productId,
-    name: item.product_table?.name || '', // Provide a default value if product_table is null
+    name: item.product_table?.name || "", // Provide a default value if product_table is null
     price: item.product_table?.price || 0, // Provide a default value if product_table is null
     quantity: item.cart_product.quantity,
   }));
@@ -75,8 +82,8 @@ export const getCartById = async (id: string) => {
   return cartWithProducts;
 };
 
-export const deleteCartById = async () => {
-  return null;
+export const deleteCartById = async (id: string) => {
+  await db.delete(saltCart).where(eq(saltCart.id, id));
 };
 
 export const createProduct = async (product: Product) => {
@@ -99,7 +106,7 @@ export const addProductToCart = async (
   const product = await getProductById(productId);
 
   if (!cart || !product) {
-    throw new Error('Cart or product not found');
+    throw new Error("Cart or product not found");
   }
 
   const existingCartProduct = await db

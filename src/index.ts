@@ -1,5 +1,5 @@
-import express from 'express';
-import { Request, Response } from 'express';
+import express from "express";
+import { Request, Response } from "express";
 import {
   getCartById,
   createCart,
@@ -7,10 +7,10 @@ import {
   deleteCartById,
   getProductById,
   addProductToCart,
-} from './drizzle/queries';
-import { InsertCart, InsertProduct } from './drizzle/schema';
+} from "./drizzle/queries";
+import { InsertCart, InsertProduct } from "./drizzle/schema";
 
-import { faker } from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 
 const app = express();
 const port = 3000;
@@ -27,62 +27,62 @@ function createRandomProduct() {
 
 //create product
 
-app.post('/api/products', async (req: Request, res: Response) => {
+app.post("/api/products", async (req: Request, res: Response) => {
   const fakerProduct = createRandomProduct();
 
   try {
     await createProduct(fakerProduct);
-    res.status(201).send('product created!!');
+    res.status(201).send("product created!!");
   } catch (error) {
-    console.error('Error creating recipe:', error);
-    res.status(500).send('Some post error :(');
+    console.error("Error creating recipe:", error);
+    res.status(500).send("Some post error :(");
   }
 });
 
 //create cart
-app.post('/api/carts', async (req: Request, res: Response) => {
+app.post("/api/carts", async (req: Request, res: Response) => {
   try {
-    const newCart: InsertCart = await createCart();
-    res.status(201).location(`/api/carts/${newCart.id}`).json(newCart);
+    const { id } = await createCart();
+    res.status(201).location(`/api/carts/${id}`).json(id);
   } catch (error) {
-    console.error('Error creating cart:', error);
-    res.status(500).json({ message: 'Error creating cart' });
+    console.error("Error creating cart:", error);
+    res.status(500).json({ message: "Error creating cart" });
   }
 });
 
 //get cart by id
 
-app.get('/api/carts/:cartId', async (req: Request, res: Response) => {
+app.get("/api/carts/:cartId", async (req: Request, res: Response) => {
   const { cartId } = req.params;
   try {
     const cart = await getCartById(cartId);
 
-    if (!cart) return res.status(404).json({ message: 'Cart not found' });
+    if (!cart) return res.status(404).json({ message: "Cart not found" });
 
     res.json(cart);
   } catch (error) {
-    console.error('Error fetching cart:', error);
-    res.status(500).json({ message: 'Error fetching cart' });
+    console.error("Error fetching cart:", error);
+    res.status(500).json({ message: "Error fetching cart" });
   }
 });
 
 //get product by Id
 
-app.get('/api/products/:id', async (req: Request, res: Response) => {
+app.get("/api/products/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
   try {
     const product = await getProductById(id);
 
-    if (!product) return res.status(404).json({ message: 'Cart not found' });
+    if (!product) return res.status(404).json({ message: "Cart not found" });
 
     res.json(product);
   } catch (error) {
-    console.error('Error fetching cart:', error);
-    res.status(500).json({ message: 'Error fetching cart' });
+    console.error("Error fetching cart:", error);
+    res.status(500).json({ message: "Error fetching cart" });
   }
 });
 app.post(
-  '/api/carts/:cartId/products/',
+  "/api/carts/:cartId/products/",
   async (req: Request, res: Response) => {
     const { cartId } = req.params;
     const { productId, quantity } = req.body;
@@ -90,16 +90,27 @@ app.post(
     try {
       const updatedCart = await addProductToCart(productId, cartId, quantity);
       if (!updatedCart) {
-        return res.status(404).json({ message: 'Cart or product not found' });
+        return res.status(404).json({ message: "Cart or product not found" });
       }
 
       res.status(200).json(updatedCart);
     } catch (error) {
-      console.error('Error fetching cart:', error);
-      res.status(500).json({ message: 'Error adding product to cart' });
+      console.error("Error fetching cart:", error);
+      res.status(500).json({ message: "Error adding product to cart" });
     }
   }
 );
+
+app.delete("api/carts/:cartId", async (req: Request, res: Response) => {
+  const { id } = req.params;
+  try {
+    await deleteCartById(id);
+    res.status(201).json({ mesasage: "Cart deleted" });
+  } catch (error) {
+    console.error("Error deleting cart:", error);
+    res.status(500).json({ message: "Error deleting cart" });
+  }
+});
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`);
