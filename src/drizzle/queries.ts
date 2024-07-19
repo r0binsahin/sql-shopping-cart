@@ -83,7 +83,7 @@ export const getCartById = async (id: string) => {
 };
 
 export const deleteCartById = async (id: string) => {
-  await db.delete(saltCart).where(eq(saltCart.id, id));
+  await db.delete(saltCart).where(eq(saltCart.id, id)).execute();
 };
 
 export const createProduct = async (product: Product) => {

@@ -11,6 +11,7 @@ import {
 import { InsertCart, InsertProduct } from "./drizzle/schema";
 
 import { faker } from "@faker-js/faker";
+import { log } from "console";
 
 const app = express();
 const port = 3000;
@@ -101,10 +102,11 @@ app.post(
   }
 );
 
-app.delete("api/carts/:cartId", async (req: Request, res: Response) => {
-  const { id } = req.params;
+app.delete("/api/carts/:cartId", async (req: Request, res: Response) => {
+  const { cartId } = req.params;
+  // console.log(id);
   try {
-    await deleteCartById(id);
+    await deleteCartById(cartId);
     res.status(201).json({ mesasage: "Cart deleted" });
   } catch (error) {
     console.error("Error deleting cart:", error);
