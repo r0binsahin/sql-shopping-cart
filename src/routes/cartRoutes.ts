@@ -1,14 +1,14 @@
 import express from 'express';
 import {
-  putProductToCart,
+  addProductToCart,
   createNewCart,
   getcartById,
-  deleteCart,
+  deleteCartById,
 } from '../controllers/cartControllers';
 
 export const cartRouter = express.Router();
 
 cartRouter.post('/', createNewCart);
 cartRouter.get('/:cartId', getcartById);
-cartRouter.post('/:cartId/products/', putProductToCart);
-cartRouter.delete('/:cartId', deleteCart);
+cartRouter.post('/:cartId/products/', addProductToCart);
+cartRouter.delete('/:cartId', deleteCartById);

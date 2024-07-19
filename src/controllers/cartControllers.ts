@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
 import {
-  addProductToCart,
-  createCart,
-  deleteCartById,
-  getCartById,
+  queryAddProductToCart,
+  queryCreateCart,
+  queryDeleteCartById,
+  queryGetCartById,
 } from '../drizzle/queries';
 
 export const createNewCart = async (req: Request, res: Response) => {
   try {
-    const { id } = await createCart();
+    const { id } = await queryCreateCart();
     res.status(201).location(`/api/carts/${id}`).json(id);
   } catch (error) {
     console.error('Error creating cart:', error);
@@ -18,7 +18,7 @@ export const createNewCart = async (req: Request, res: Response) => {
 export const getcartById = async (req: Request, res: Response) => {
   const { cartId } = req.params;
   try {
-    const cart = await getCartById(cartId);
+    const cart = await queryGetCartById(cartId);
 
     if (!cart) return res.status(404).json({ message: 'Cart not found' });
 
@@ -28,12 +28,16 @@ export const getcartById = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error fetching cart' });
   }
 };
-export const putProductToCart = async (req: Request, res: Response) => {
+export const addProductToCart = async (req: Request, res: Response) => {
   const { cartId } = req.params;
   const { productId, quantity } = req.body;
 
   try {
-    const updatedCart = await addProductToCart(productId, cartId, quantity);
+    const updatedCart = await queryAddProductToCart(
+      productId,
+      cartId,
+      quantity
+    );
     if (!updatedCart) {
       return res.status(404).json({ message: 'Cart or product not found' });
     }
@@ -44,11 +48,11 @@ export const putProductToCart = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Error adding product to cart' });
   }
 };
-export const deleteCart = async (req: Request, res: Response) => {
+export const deleteCartById = async (req: Request, res: Response) => {
   const { cartId } = req.params;
   // console.log(id);
   try {
-    await deleteCartById(cartId);
+    await queryDeleteCartById(cartId);
     res.status(201).json({ mesasage: 'Cart deleted' });
   } catch (error) {
     console.error('Error deleting cart:', error);

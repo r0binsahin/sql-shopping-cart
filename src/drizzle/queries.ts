@@ -7,9 +7,9 @@ import {
   InsertCart,
   CartProduct,
   ProductInCart,
-} from "./schema";
-import { db } from "./index";
-import { eq, and } from "drizzle-orm";
+} from './schema';
+import { db } from './index';
+import { eq, and } from 'drizzle-orm';
 
 type Product = {
   name: string;
@@ -29,7 +29,7 @@ type AddCart = {
   id: string;
 };
 
-export const createCart = async () => {
+export const queryCreateCart = async () => {
   const result = await db
     .insert(saltCart)
     .values({})
@@ -38,7 +38,7 @@ export const createCart = async () => {
   return { id: newCart.id };
 };
 
-export const getCartById = async (id: string) => {
+export const queryGetCartById = async (id: string) => {
   const cartResult = await db
     .select()
     .from(saltCart)
@@ -67,7 +67,7 @@ export const getCartById = async (id: string) => {
 
   const mappedCartItems = cartItems.map((item) => ({
     productId: item.cart_product.productId,
-    name: item.product_table?.name || "", // Provide a default value if product_table is null
+    name: item.product_table?.name || '', // Provide a default value if product_table is null
     price: item.product_table?.price || 0, // Provide a default value if product_table is null
     quantity: item.cart_product.quantity,
   }));
@@ -82,7 +82,7 @@ export const getCartById = async (id: string) => {
   return cartWithProducts;
 };
 
-export const deleteCartById = async (id: string) => {
+export const queryDeleteCartById = async (id: string) => {
   await db.delete(saltCart).where(eq(saltCart.id, id)).execute();
 };
 
@@ -97,16 +97,16 @@ export const getProductById = async (productId: string) => {
     .where(eq(productTable.id, productId));
 };
 
-export const addProductToCart = async (
+export const queryAddProductToCart = async (
   productId: string,
   cartId: string,
   quantity: number
 ) => {
-  const cart = await getCartById(cartId);
+  const cart = await queryGetCartById(cartId);
   const product = await getProductById(productId);
 
   if (!cart || !product) {
-    throw new Error("Cart or product not found");
+    throw new Error('Cart or product not found');
   }
 
   const existingCartProduct = await db
@@ -137,6 +137,6 @@ export const addProductToCart = async (
     });
   }
 
-  const updatedCart = await getCartById(cartId);
+  const updatedCart = await queryGetCartById(cartId);
   return updatedCart;
 };
